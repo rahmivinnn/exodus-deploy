@@ -13,6 +13,58 @@ import { Switch } from "@/components/ui/switch"
 import { MapPin, Download, Send, MessageSquare } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
+const usaLocations = [
+  "New York, NY",
+  "Los Angeles, CA",
+  "Chicago, IL",
+  "Houston, TX",
+  "Phoenix, AZ",
+  "Philadelphia, PA",
+  "San Antonio, TX",
+  "San Diego, CA",
+  "Dallas, TX",
+  "San Jose, CA",
+  "Austin, TX",
+  "Jacksonville, FL",
+  "Fort Worth, TX",
+  "Columbus, OH",
+  "Charlotte, NC",
+  "San Francisco, CA",
+  "Indianapolis, IN",
+  "Seattle, WA",
+  "Denver, CO",
+  "Washington, DC",
+  "Boston, MA",
+  "El Paso, TX",
+  "Nashville, TN",
+  "Detroit, MI",
+  "Oklahoma City, OK",
+  "Portland, OR",
+  "Las Vegas, NV",
+  "Memphis, TN",
+  "Louisville, KY",
+  "Baltimore, MD",
+  "Milwaukee, WI",
+  "Albuquerque, NM",
+  "Tucson, AZ",
+  "Fresno, CA",
+  "Sacramento, CA",
+  "Mesa, AZ",
+  "Kansas City, MO",
+  "Atlanta, GA",
+  "Long Beach, CA",
+  "Colorado Springs, CO",
+  "Raleigh, NC",
+  "Miami, FL",
+  "Virginia Beach, VA",
+  "Omaha, NE",
+  "Oakland, CA",
+  "Minneapolis, MN",
+  "Tulsa, OK",
+  "Arlington, TX",
+  "Tampa, FL"
+]
+
 const mockHistoricalData = [
   { month: "Sep 2024", kma: 2750, similar: 2600 },
   { month: "Oct 2024", kma: 2680, similar: 2550 },
@@ -65,7 +117,7 @@ export function FreightRateCalculator() {
   const downloadPDF = () => {
     // Mock PDF download
     const element = document.createElement("a")
-    element.href = "data:text/plain;charset=utf-8,UK Freight Quote - Mock PDF Content"
+    element.href = "data:text/plain;charset=utf-8,USA Freight Quote - Mock PDF Content"
     element.download = `freight-quote-${Date.now()}.txt`
     document.body.appendChild(element)
     element.click()
@@ -94,22 +146,34 @@ export function FreightRateCalculator() {
 
             <div>
               <Label htmlFor="origin">Origin</Label>
-              <Input
-                id="origin"
-                placeholder="e.g., London"
-                value={origin}
-                onChange={(e) => setOrigin(e.target.value)}
-              />
+              <Select value={origin} onValueChange={setOrigin}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select origin city" />
+                </SelectTrigger>
+                <SelectContent>
+                  {usaLocations.map((location) => (
+                    <SelectItem key={location} value={location}>
+                      {location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
               <Label htmlFor="destination">Destination</Label>
-              <Input
-                id="destination"
-                placeholder="e.g., Manchester M1 1AA"
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-              />
+              <Select value={destination} onValueChange={setDestination}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select destination city" />
+                </SelectTrigger>
+                <SelectContent>
+                  {usaLocations.map((location) => (
+                    <SelectItem key={location} value={location}>
+                      {location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -157,7 +221,7 @@ export function FreightRateCalculator() {
                 </p>
                 <div className="flex items-center space-x-4">
                   <Badge variant="secondary">{rateData.confidence}% Confidence</Badge>
-                  <span className="text-2xl font-bold">£{rateData.marketRate.toLocaleString()}</span>
+                  <span className="text-2xl font-bold">${rateData.marketRate.toLocaleString()}</span>
                 </div>
               </CardHeader>
               <CardContent>
@@ -167,7 +231,7 @@ export function FreightRateCalculator() {
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" />
                       <YAxis domain={[1500, 4000]} />
-                      <Tooltip formatter={(value) => [`£${value}`, ""]} />
+                      <Tooltip formatter={(value) => [`$${value}`, ""]} />
                       <Line type="monotone" dataKey="kma" stroke="#f97316" strokeWidth={2} />
                       <Line type="monotone" dataKey="similar" stroke="#f97316" strokeDasharray="5 5" strokeWidth={2} />
                     </LineChart>
@@ -175,9 +239,9 @@ export function FreightRateCalculator() {
                 </div>
 
                 <div className="flex justify-between items-center mb-4">
-                  <Badge variant="outline">Min £{rateData.minRate.toLocaleString()}</Badge>
-                  <Badge>£{rateData.marketRate.toLocaleString()}</Badge>
-                  <Badge variant="outline">Max £{rateData.maxRate.toLocaleString()}</Badge>
+                  <Badge variant="outline">Min ${rateData.minRate.toLocaleString()}</Badge>
+                  <Badge>${rateData.marketRate.toLocaleString()}</Badge>
+                  <Badge variant="outline">Max ${rateData.maxRate.toLocaleString()}</Badge>
                 </div>
 
                 <div className="space-y-4">
@@ -202,9 +266,9 @@ export function FreightRateCalculator() {
                 <Card className="mt-4">
                   <CardContent className="p-4">
                     <div className="flex justify-between items-center">
-                      <span>Verified Sell Rate: £{rateData.verifiedSellRate.toLocaleString()}</span>
+                      <span>Verified Sell Rate: ${rateData.verifiedSellRate.toLocaleString()}</span>
                       <span>
-                        Markup {rateData.markupPercent}% | £{rateData.markupAmount.toLocaleString()}
+                        Markup {rateData.markupPercent}% | ${rateData.markupAmount.toLocaleString()}
                       </span>
                     </div>
                   </CardContent>
@@ -243,7 +307,7 @@ export function FreightRateCalculator() {
                 <CardTitle>Verified Buy Rate</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold mb-2">£{rateData.verifiedBuyRate.toLocaleString()}</div>
+                <div className="text-2xl font-bold mb-2">${rateData.verifiedBuyRate.toLocaleString()}</div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Confidence</span>
